@@ -13,8 +13,7 @@ pub fn gen_fsm(item: TokenStream) -> TokenStream {
     let mut match_arms = quote!();
     let mut variants = quote!();
     for state in input.iter() {
-        let name = state.name.to_case(Case::Pascal);
-        let name = Ident::new(&name, Span::call_site().into());
+        let name = to_ident(&state.name);
         variants = quote!(
             #variants
             #name,
@@ -22,8 +21,7 @@ pub fn gen_fsm(item: TokenStream) -> TokenStream {
         let mut inner_match_arms = quote!();
         if state.total_probability == 1 {
             let choice = &state.choices[0];
-            let next_state = input[choice.next_ngram].name.to_case(Case::Pascal);
-            let next_state = Ident::new(&next_state, Span::call_site().into());
+            let next_state = to_ident(&input[choice.next_ngram].name);
             let next_char = LitChar::new(choice.next_char, Span::call_site().into());
             match_arms = quote!(
                 #match_arms
@@ -32,8 +30,7 @@ pub fn gen_fsm(item: TokenStream) -> TokenStream {
             continue;
         }
         for choice in &state.choices {
-            let next_state = input[choice.next_ngram].name.to_case(Case::Pascal);
-            let next_state = Ident::new(&next_state, Span::call_site().into());
+            let next_state = to_ident(&input[choice.next_ngram].name);
             let cumulative_probability = choice.cumulative_probability - 1;
             let next_char = LitChar::new(choice.next_char, Span::call_site().into());
             inner_match_arms = quote!(
@@ -52,15 +49,20 @@ pub fn gen_fsm(item: TokenStream) -> TokenStream {
     }
     quote!(
         #[derive(Debug, Clone, Copy)]
-        enum StateMachine {
+        pub enum StateMachine {
             #variants
         }
         impl StateMachine {
-            fn generate(self, mut rng: impl ::rand_core::RngCore) -> (Self, char) {
+            pub fn generate(self, mut rng: impl ::rand_core::RngCore) -> (Self, char) {
                 match self {
                     #match_arms
                 }
             }
         }
-    ).into()
+    )
+    .into()
+}
+
+fn to_ident(name: &str) -> Ident {
+    Ident::new(&name.replace(';', " semicolon").to_case(Case::Pascal), Span::call_site().into())
 }
