@@ -1,0 +1,16 @@
+[package]
+name = "uwurandom-rs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dev-dependencies]
+rand_pcg = "0.3.1"
+
+[dependencies]
+rand_core = "0.6.4"
+uwurandom-proc-macros = { version = "0.1.0", path = "uwurandom-proc-macros" }
+
+[workspace]
+members = ["uwurandom-proc-macros"]
