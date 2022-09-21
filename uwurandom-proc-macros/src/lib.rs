@@ -80,11 +80,11 @@ pub fn gen_fsm(item: TokenStream) -> TokenStream {
 fn to_ident(name: &str) -> Ident {
     Ident::new(
         &name
-            .replace(';', " semicolon") // Sanitize ident-unsafe characters
-            .replace('!', " exclamation")
-            .replace(',', " comma")
-            .replace('.', " period") // I'm not calling it a full stop
-            .replace(' ', " space")
+            .replace(' ', " space ")
+            .replace(';', " semicolon ") // Sanitize ident-unsafe characters
+            .replace('!', " exclamation ")
+            .replace(',', " comma ")
+            .replace('.', " period ") // I'm not calling it a full stop
             .to_case(Case::Pascal),
         Span::call_site().into(),
     )
