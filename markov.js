@@ -253,7 +253,7 @@ const catgirlTable = generateMarkov(catgirlNonsense.split('\n'), 2)
 const keysmashTable = generateMarkov(keysmash, 1);
 const scrunklyTable = generateMarkov(scrunks, 2);
 
-console.log(JSON.stringify(magic(catgirlTable)))
+console.log(JSON.stringify(magic(scrunklyTable)))
 
 // console.log(generateFromArray(catgirlTable, 100, 'ny'));
 //

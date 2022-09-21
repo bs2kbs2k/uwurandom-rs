@@ -12,8 +12,15 @@ pub fn gen_fsm(item: TokenStream) -> TokenStream {
     let input: Vec<MarkovArr> = serde_json::from_str(&format!("[{}]", item)).unwrap();
     let mut match_arms = quote!();
     let mut variants = quote!();
-    for state in input.iter() {
+    let mut random_selection_match_arms = quote!();
+    for (idx, state) in input.iter().enumerate() {
         let name = to_ident(&state.name);
+        let name_lit = &state.name;
+        let idx = idx as u32;
+        random_selection_match_arms = quote!(
+            #random_selection_match_arms
+            #idx => (Self::#name, #name_lit),
+        );
         variants = quote!(
             #variants
             #name,
@@ -47,6 +54,7 @@ pub fn gen_fsm(item: TokenStream) -> TokenStream {
             },
         );
     }
+    let variant_count = input.len() as u32;
     quote!(
         #[derive(Debug, Clone, Copy)]
         pub enum StateMachine {
@@ -58,11 +66,26 @@ pub fn gen_fsm(item: TokenStream) -> TokenStream {
                     #match_arms
                 }
             }
+            pub fn new_random(mut rng: impl ::rand_core::RngCore) -> (Self, &'static str) {
+                match rng.next_u32() % #variant_count {
+                    #random_selection_match_arms
+                    _ => unreachable!()
+                }
+            }
         }
     )
     .into()
 }
 
 fn to_ident(name: &str) -> Ident {
-    Ident::new(&name.replace(';', " semicolon").to_case(Case::Pascal), Span::call_site().into())
+    Ident::new(
+        &name
+            .replace(';', " semicolon") // Sanitize ident-unsafe characters
+            .replace('!', " exclamation")
+            .replace(',', " comma")
+            .replace('.', " period") // I'm not calling it a full stop
+            .replace(' ', " space")
+            .to_case(Case::Pascal),
+        Span::call_site().into(),
+    )
 }
