@@ -13,14 +13,14 @@ mod tests {
     fn catgirl_nonsense_test() {
         // Use a stable-algorithm RNG with fixed seed
         let mut rng = rand_pcg::Pcg32::new(0xcafef00dd15ea5e5, 0xa02bdbf7bb3c0a7);
-        let mut state_machine = catgirl_nonsense::StateMachine::Ny;
-        let mut result = String::from("ny");
+        let mut state_machine = catgirl_nonsense::StateMachine::Mr;
+        let mut result = String::from("mr");
         for _ in 0..100 {
             let (new_state, generated) = state_machine.generate(&mut rng);
             result.push(generated);
             state_machine = new_state;
         }
-        assert_eq!(&result, "nyaaaameowmrowrmrowmrrmeowmrowmeownyanyaaaaaaaaaaaaamraowrmeowwwmeowmraowmrowmrowmeowmeowrnyamreownyaa");
+        assert_eq!(&result, "mrowrnyameowmrowrmrowmrrmeowmrowmeownyanyaaaaaaaaaaaaamraowrmeowwwmeowmraowmrowmrowmeowmeowrnyamreowny");
     }
 
     #[test]
